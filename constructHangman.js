@@ -1,56 +1,91 @@
 var inquirer = require('inquirer')
-
-function gamePlay () {
-  this.word = ''
-  this.life = 5
-  this.chance = 10
-  this.newWord = function (word) {
-    var wordToGuess = ''
-    for (var i = 0; i < word.length; i++) {
-      if (word[i] != ' ') {
-        wordToGuess += '_'
-      } else {
-        wordToGuess += ' '
-      }
-    }
-    console.log('in new word function')
-    console.log(wordToGuess)
-    return wordToGuess
-  }
-  this.guessed = function (guessed, toGuess) {
-    console.log('guessing.. ' + guessed)
-    var pos = toGuess.indexOf(guessed)
-
-    while(pos !== -1){
-      this.word[pos] = guessed
-      pos = toGuess.indexOf(guessed, pos + 1)
-      console.log("here");
-      console.log(this.word[pos])
-    }
-
-    if (toGuess.indexOf(guessed) >= 0) {
-      console.log('correct! ')
+var word = require('./word.js');
 
 
-      for (var i = 0; i < this.word.length; i++) {
-        if (toGuess[i] === guessed) {
-          console.log(toGuess[i] + ' matched with guessed ' + guessed)
-          console.log(this.word[i])
-          this.word[i] = guessed
-          // this.currentPlay[i] = guessed;   
-          console.log(this.word[i])
-        // this.currentPlay[i] = guessed
-        }
-      }
-    }else {
-      console.log('incorrect!')
-      this.chance--
-    }
-    console.log(this.currentPlay)
-  }
+console.log(word[0]);
+
+function wordInfo(word){
+	this.word = word;
+	this.wordArr = [];
+	this.playWordArr = [];
+	this.length = this.word.length;
+	this.makeWordArr = function(word){
+		for(var i =0; i<word.length; i++){
+			this.wordArr.push(word[i]);
+		}
+		console.log(this.wordArr);
+	}
+	this.makePlayWordArr = function(word) {
+		for(var i=0; i< word.length; i++){
+			if(word[i] === " "){
+				this.playWordArr.push(" ");
+			}else{
+				this.playWordArr.push("_");
+			}
+		}
+		console.log(this.playWordArr);
+	}
 }
-var movieToGuess = 'lord of the ring'
-var newPlay = new gamePlay()
-newPlay.word = newPlay.newWord(movieToGuess)
-console.log(newPlay.word)
-newPlay.guessed('d', movieToGuess)
+
+function gamePlay(wordInfo){
+	this.wordInfo = wordInfo;
+	this.userGuess = function(letter){
+		for(var i=0; i< this.wordInfo.wordArr.length; i++){
+			console.log(this.wordInfo.wordArr);
+			if(this.wordInfo.wordArr[i] == letter){
+				console.log(this.wordInfo.wordArr[i] + "/ " + letter);
+				console.log("found a matched letter! proceed with replacing the array slot");
+				this.wordInfo.playWordArr[i] = letter;
+			}
+		}
+		console.log(this.wordInfo.playWordArr);
+	}	
+}
+
+
+var newWord = new wordInfo("test testing");
+var newGamePlay = new gamePlay(newWord);
+function startGamePlay(){
+	inquirer.prompt([
+		{
+			name: "confirm",
+			type: "confirm",
+			message: "start the game?"
+		}
+	]).then(function (answer){
+		if(answer.confirm === true){
+			
+			newWord.makeWordArr(newWord.word);
+			newWord.makePlayWordArr(newWord.word);
+			var onceGuessCorrectly = false;
+
+			promptGamePlay();
+		}else{
+			console.log("Good bye");
+		}
+	})
+}
+
+function promptGamePlay(){
+	inquirer.prompt([{
+		name: "txtGuess",
+		message: "Guess a letter"
+	}]).then(function (answer) {
+		console.log("user guessed .. " + answer.txtGuess);
+		newGamePlay.userGuess(answer.txtGuess);
+		if (newGamePlay.wordInfo.playWordArr.indexOf("_") == -1 ){
+			console.log("You guessed all it right!");
+			newWord = new wordInfo("what mate");
+			newGamePlay = new gamePlay(newWord);
+			startGamePlay();
+		}
+		else{
+			promptGamePlay();
+		}
+	})
+}
+
+startGamePlay();
+//promptGamePlay();
+
+

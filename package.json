@@ -1,0 +1,24 @@
+{
+  "name": "construct-hangman",
+  "version": "1.0.0",
+  "description": "hangman game in bash",
+  "main": "constructHangman.js",
+  "dependencies": {
+    "inquirer": "^4.0.2",
+    "prompt": "^1.0.0"
+  },
+  "devDependencies": {},
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/ShiKwan/ConstructorHangman.git"
+  },
+  "author": "Shi-Kwan, Tan",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/ShiKwan/ConstructorHangman/issues"
+  },
+  "homepage": "https://github.com/ShiKwan/ConstructorHangman#readme"
+}
