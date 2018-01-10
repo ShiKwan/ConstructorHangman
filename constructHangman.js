@@ -1,91 +1,85 @@
 var inquirer = require('inquirer')
-var word = require('./word.js');
+var chalk = require('chalk')
+var word = require('./word.js')
+var wordInfo = require('./wordInfo.js')
+var gamePlay = require('./gamePlay.js')
 
 
-console.log(word[0]);
-
-function wordInfo(word){
-	this.word = word;
-	this.wordArr = [];
-	this.playWordArr = [];
-	this.length = this.word.length;
-	this.makeWordArr = function(word){
-		for(var i =0; i<word.length; i++){
-			this.wordArr.push(word[i]);
-		}
-		console.log(this.wordArr);
-	}
-	this.makePlayWordArr = function(word) {
-		for(var i=0; i< word.length; i++){
-			if(word[i] === " "){
-				this.playWordArr.push(" ");
-			}else{
-				this.playWordArr.push("_");
-			}
-		}
-		console.log(this.playWordArr);
-	}
+var newWord = new wordInfo('')
+var newGamePlay = new gamePlay(newWord)
+function startGamePlay () {
+  inquirer.prompt([
+    {
+      name: 'confirm',
+      type: 'confirm',
+      message: 'start the game?'
+    }
+  ]).then(function (answer) {
+    if (answer.confirm === true) {
+      newWord.word = word[0]
+      removeA(word, word[0])
+      newWord.makeWordArr(newWord.word)
+      newWord.makePlayWordArr(newWord.word)
+      promptGamePlay()
+    }else {
+      console.log('Good bye')
+    }
+  })
 }
 
-function gamePlay(wordInfo){
-	this.wordInfo = wordInfo;
-	this.userGuess = function(letter){
-		for(var i=0; i< this.wordInfo.wordArr.length; i++){
-			console.log(this.wordInfo.wordArr);
-			if(this.wordInfo.wordArr[i] == letter){
-				console.log(this.wordInfo.wordArr[i] + "/ " + letter);
-				console.log("found a matched letter! proceed with replacing the array slot");
-				this.wordInfo.playWordArr[i] = letter;
-			}
-		}
-		console.log(this.wordInfo.playWordArr);
-	}	
+function promptGamePlay () {
+  inquirer.prompt([{
+    name: 'txtGuess',
+    message: 'Guess a letter',
+    validate: function (value) {
+      if ((value.length === 1) && (value.indexOf(' ') === -1)) {
+        return true
+      }
+      return 'Please enter only ' + chalk.bold('*ONE*') + ' valid character (a-z)'
+    }
+  }]).then(function (answer) {
+    newGamePlay.userGuess(answer.txtGuess)
+    if (newGamePlay.triesLeft > 0) {
+      if (newGamePlay.wordInfo.playWordArr.indexOf('_') == -1) {
+        if (word.length > 0) {
+          newWord.word = word[0]
+          removeA(word, word[0])
+          console.log('you got it right! next word!')
+          newWord.makeWordArr(newWord.word)
+          newWord.makePlayWordArr(newWord.word)
+          newGamePlay.triesLeft = 10
+          promptGamePlay()
+        }else {
+          console.log("you beat the game, i'm out of words, get out there and get a life")
+        }
+      }else {
+        promptGamePlay()
+      }
+    }else {
+      console.log('you are out of tries, try another word!')
+      if (word.length > 0) {
+        newWord.word = word[0]
+        removeA(word, word[0])
+        newWord.makeWordArr(newWord.word)
+        newWord.makePlayWordArr(newWord.word)
+        newGamePlay.triesLeft = 10
+        promptGamePlay()
+      }else {
+        console.log('no words left =/ thanks for playing!')
+      }
+    }
+  })
 }
 
-
-var newWord = new wordInfo("test testing");
-var newGamePlay = new gamePlay(newWord);
-function startGamePlay(){
-	inquirer.prompt([
-		{
-			name: "confirm",
-			type: "confirm",
-			message: "start the game?"
-		}
-	]).then(function (answer){
-		if(answer.confirm === true){
-			
-			newWord.makeWordArr(newWord.word);
-			newWord.makePlayWordArr(newWord.word);
-			var onceGuessCorrectly = false;
-
-			promptGamePlay();
-		}else{
-			console.log("Good bye");
-		}
-	})
+var removeA = function (arr) {
+  var what, a = arguments, L = a.length, ax
+  while (L > 1 && arr.length) {
+    what = a[--L]
+    while ((ax = arr.indexOf(what)) !== -1) {
+      arr.splice(ax, 1)
+    }
+  }
+  return arr
 }
 
-function promptGamePlay(){
-	inquirer.prompt([{
-		name: "txtGuess",
-		message: "Guess a letter"
-	}]).then(function (answer) {
-		console.log("user guessed .. " + answer.txtGuess);
-		newGamePlay.userGuess(answer.txtGuess);
-		if (newGamePlay.wordInfo.playWordArr.indexOf("_") == -1 ){
-			console.log("You guessed all it right!");
-			newWord = new wordInfo("what mate");
-			newGamePlay = new gamePlay(newWord);
-			startGamePlay();
-		}
-		else{
-			promptGamePlay();
-		}
-	})
-}
-
-startGamePlay();
-//promptGamePlay();
-
-
+startGamePlay()
