@@ -3,11 +3,12 @@ var chalk = require('chalk')
 var word = require('./word.js')
 var wordInfo = require('./wordInfo.js')
 var gamePlay = require('./gamePlay.js')
-var gamePlaySteps = require('./gamePlaySteps.js');
 
-var newWord = new wordInfo('')
-var newGamePlay = new gamePlay(newWord)
-function startGamePlay () {
+var newWord = new wordInfo(word[0])
+var newGamePlay = new gamePlay(wordInfo)
+
+console.log(newWord.word)
+var startGamePlay = function (newWord) {
   inquirer.prompt([
     {
       name: 'confirm',
@@ -27,7 +28,7 @@ function startGamePlay () {
   })
 }
 
-function promptGamePlay () {
+var promptGamePlay = function (newWord, newGamePlay) {
   inquirer.prompt([{
     name: 'txtGuess',
     message: 'Guess a letter',
@@ -38,7 +39,11 @@ function promptGamePlay () {
       return 'Please enter only ' + chalk.bold('*ONE*') + ' valid character (a-z)'
     }
   }]).then(function (answer) {
+    console.log(newWord)
+    console.log(newGamePlay)
     newGamePlay.userGuess(answer.txtGuess)
+    console.log(newWord)
+    console.log(newGamePlay)
     if (newGamePlay.triesLeft > 0) {
       if (newGamePlay.wordInfo.playWordArr.indexOf('_') == -1) {
         if (word.length > 0) {
@@ -82,4 +87,8 @@ var removeA = function (arr) {
   return arr
 }
 
-startGamePlay()
+module.exports = {
+  removeA: removeA,
+  promptGamePlay: promptGamePlay,
+  startGamePlay: startGamePlay
+}
