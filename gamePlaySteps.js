@@ -7,7 +7,6 @@ var gamePlay = require('./gamePlay.js')
 var newWord = new wordInfo(word[0])
 var newGamePlay = new gamePlay(wordInfo)
 
-console.log(newWord.word)
 var startGamePlay = function (newWord) {
   inquirer.prompt([
     {
